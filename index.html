@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuis Matematika Interaktif</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(150deg, #000000, #00ab00);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .header h1 {
+      color: #1e3c72;
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .quiz-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      background: #f4f7fb;
+      padding: 15px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    .question-box {
+      margin-bottom: 20px;
+    }
+
+    .question-number {
+      color: #2a5298;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .question {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .options {
+      display: grid;
+      gap: 15px;
+    }
+
+    .option {
+      padding: 15px;
+      border: 2px solid #000000;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s ease;
+      background: #ffffff;
+      font-size: 1rem;
+    }
+
+    .option:hover {
+      background: #b9fcb8;
+      border-color: #2a5298;
+      transform: translateY(-2px);
+    }
+
+    .option.selected {
+      background: #04ff00;
+      color: #000000;
+      border-color: #025e00;
+    }
+
+    .buttons {
+      margin-top: 25px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    .btn-prev {
+      background: #ffffff;
+      color: #333;
+    }
+
+    .btn-next {
+      background: #2a5298;
+      color: white;
+    }
+
+    .btn-prev:hover,
+    .btn-next:hover {
+      transform: scale(1.03);
+    }
+
+    .result-box {
+      text-align: center;
+      display: none;
+    }
+
+    .result-box h2 {
+      color: #1e3c72;
+      margin-bottom: 15px;
+      font-size: 2rem;
+    }
+
+    .score {
+      font-size: 3rem;
+      color: #2a5298;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+
+    .review {
+      text-align: left;
+      margin-top: 30px;
+    }
+
+    .review-item {
+      background: #f4f7fb;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .correct {
+      color: green;
+      font-weight: bold;
+    }
+
+    .wrong {
+      color: red;
+      font-weight: bold;
+    }
+
+    .restart-btn {
+      margin-top: 20px;
+      background: #28a745;
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+      .question {
+        font-size: 1.1rem;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="quiz-container">
+      <div class="header">
+        <h1>Kuis Matematika Interaktif</h1>
+        <p>Jawab 10 soal matematika dengan teliti!</p>
+      </div>
+
+      <div class="quiz-info">
+        <span id="progress">Soal 1 dari 10</span>
+        <span id="score">Skor: 0</span>
+      </div>
+
+      <div class="question-box">
+        <div class="question-number" id="question-number"></div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn-prev" id="prevBtn">Sebelumnya</button>
+        <button class="btn-next" id="nextBtn">Selanjutnya</button>
+      </div>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <h2>Hasil Kuis</h2>
+      <p>Skor akhir kamu:</p>
+      <div class="score" id="final-score"></div>
+      <p id="message"></p>
+
+      <div class="review" id="review"></div>
+
+      <button class="restart-btn" onclick="restartQuiz()">Ulangi Kuis</button>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: 'Berapakah hasil dari 25 * 4?',
+        options: ['80', '90', '100', '120'],
+        answer: '100'
+      },
+      {
+        question: 'Jika x = 5, maka nilai dari 2x + 3 adalah?',
+        options: ['10', '12', '13', '15'],
+        answer: '13'
+      },
+      {
+        question: 'Berapakah hasil dari 144 / 12?',
+        options: ['10', '11', '12', '13'],
+        answer: '12'
+      },
+      {
+        question: 'Luas persegi dengan sisi 9 cm adalah?',
+        options: ['18 cm²', '36 cm²', '72 cm²', '81 cm²'],
+        answer: '81 cm²'
+      },
+      {
+        question: 'Berapakah akar kuadrat dari 225?',
+        options: ['13', '14', '15', '16'],
+        answer: '15'
+      },
+      {
+        question: 'Hasil dari 7² + 3² adalah?',
+        options: ['49', '52', '58', '60'],
+        answer: '58'
+      },
+      {
+        question: 'Jika sebuah segitiga memiliki alas 10 cm dan tinggi 8 cm, luasnya adalah?',
+        options: ['40 cm²', '60 cm²', '80 cm²', '90 cm²'],
+        answer: '40 cm²'
+      },
+      {
+        question: 'Berapakah hasil dari 3/4 + 1/4?',
+        options: ['1/2', '1', '3/2', '2'],
+        answer: '1'
+      },
+      {
+        question: 'Sebuah mobil melaju 60 km/jam selama 2 jam. Jarak yang ditempuh adalah?',
+        options: ['100 km', '110 km', '120 km', '130 km'],
+        answer: '120 km'
+      },
+      {
+        question: 'Berapakah nilai dari 5! (5 faktorial)?',
+        options: ['25', '60', '100', '120'],
+        answer: '120'
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedAnswers = new Array(quizData.length).fill(null);
+
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const progressEl = document.getElementById('progress');
+    const scoreEl = document.getElementById('score');
+    const questionNumberEl = document.getElementById('question-number');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+
+    function loadQuestion() {
+      const currentQuiz = quizData[currentQuestion];
+
+      questionNumberEl.textContent = `Pertanyaan ${currentQuestion + 1}`;
+      questionEl.textContent = currentQuiz.question;
+      progressEl.textContent = `Soal ${currentQuestion + 1} dari ${quizData.length}`;
+      scoreEl.textContent = `Skor: ${score}`;
+
+      optionsEl.innerHTML = '';
+
+      currentQuiz.options.forEach(option => {
+        const optionBtn = document.createElement('div');
+        optionBtn.classList.add('option');
+        optionBtn.textContent = option;
+
+        if (selectedAnswers[currentQuestion] === option) {
+          optionBtn.classList.add('selected');
+        }
+
+        optionBtn.addEventListener('click', () => selectOption(option, optionBtn));
+
+        optionsEl.appendChild(optionBtn);
+      });
+
+      prevBtn.style.display = currentQuestion === 0 ? 'none' : 'inline-block';
+      nextBtn.textContent = currentQuestion === quizData.length - 1 ? 'Selesai' : 'Selanjutnya';
+    }
+
+    function selectOption(option, element) {
+      const allOptions = document.querySelectorAll('.option');
+      allOptions.forEach(opt => opt.classList.remove('selected'));
+
+      element.classList.add('selected');
+      selectedAnswers[currentQuestion] = option;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (selectedAnswers[currentQuestion] === null) {
+        alert('Silakan memilih jawaban terlebih dahulu!');
+        return;
+      }
+
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        loadQuestion();
+      }
+    });
+
+    function calculateScore() {
+      score = 0;
+      quizData.forEach((quiz, index) => {
+        if (selectedAnswers[index] === quiz.answer) {
+          score += 10;
+        }
+      });
+    }
+
+    function showResults() {
+      calculateScore();
+
+      document.getElementById('quiz-container').style.display = 'none';
+      document.getElementById('result-box').style.display = 'block';
+
+      document.getElementById('final-score').textContent = `${score} / 100`;
+
+      let message = '';
+
+      if (score === 100) {
+        message = 'Luar biasa! Semua jawaban benar!';
+      } else if (score >= 70) {
+        message = 'Bagus sekali! Pertahankan prestasimu!';
+      } else if (score >= 50) {
+        message = 'Cukup baik, terus berlatih ya!';
+      } else {
+        message = 'Jangan menyerah, terus belajar matematika!';
+      }
+
+      document.getElementById('message').textContent = message;
+
+      const reviewEl = document.getElementById('review');
+      reviewEl.innerHTML = '<h3>Review Jawaban:</h3><br>';
+
+      quizData.forEach((quiz, index) => {
+        const isCorrect = selectedAnswers[index] === quiz.answer;
+
+        reviewEl.innerHTML += `
+          <div class="review-item">
+            <p><strong>${index + 1}. ${quiz.question}</strong></p>
+            <p>Jawaban Kamu: <span class="${isCorrect ? 'correct' : 'wrong'}">${selectedAnswers[index]}</span></p>
+            <p>Jawaban Benar: <span class="correct">${quiz.answer}</span></p>
+          </div>
+        `;
+      });
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      selectedAnswers = new Array(quizData.length).fill(null);
+
+      document.getElementById('quiz-container').style.display = 'block';
+      document.getElementById('result-box').style.display = 'none';
+
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
+</body>
+
+</html>
